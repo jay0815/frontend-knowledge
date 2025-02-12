@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>流式显示文件内容（逐字符追加）</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #output {
+            background-color: #f0f0f0;
+            padding: 1rem;
+            border: 1px solid #ccc;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>流式显示文件内容</h1>
+    <pre id="output">等待数据...</pre>
+    <script>
+        // 辅助函数：逐字符追加文本，delay 单位为毫秒
+        async function typeText(text, delay = 50) {
+            for (const char of text) {
+                requestAnimationFrame(() => {
+                    // 追加单个字符
+                    output.textContent += char;
+                })
+                // 延时
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+
+        async function main() {
+            const output = document.getElementById("output");
+            // 发起请求，获取服务器流式传输的数据
+            const response = await fetch("http://localhost:3000/stream", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hello: "hello" })
+            });
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            output.textContent = "";
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                // 解码当前 chunk 数据
+                const chunk = decoder.decode(value);
+                // 逐字符追加当前 chunk 的内容
+                await typeText(chunk, 20);
+            }
+        }
+        main();
+    </script>
+</body>
+
+</html>
