@@ -1,6 +1,3 @@
-## English Version: Simulating ES6+ Classes Using ES5 Functions
-
-```markdown
 # Simulating ES6+ Classes Using ES5 Functions
 
 In ES5 environments, since there is no native `class` syntax, we need to simulate ES6+ classes using functions and prototypes. This document summarizes common approaches, key points, and provides implementation examples.
